@@ -1,6 +1,6 @@
 ## LPI LangGraph Advisor: Technical Implementation Document
 
-This repository contains an agentic implementation of the Life-Atlas Protocol Interface (LPI) using a state-machine architecture. [cite_start]The agent is designed to harvest data from an MCP server and synthesize it into structured, explainable advice regarding the SMILE methodology[cite: 23, 61, 62].
+This repository contains an agentic implementation of the Life-Atlas Protocol Interface (LPI) using a state-machine architecture. The agent is designed to harvest data from an MCP server and synthesize it into structured, explainable advice regarding the SMILE methodology.
 
 ---
 
@@ -8,10 +8,10 @@ This repository contains an agentic implementation of the Life-Atlas Protocol In
 
 The agent utilizes **LangGraph** to manage the lifecycle of a query through two distinct phases:
 
-1.  [cite_start]**Research Phase**: The system identifies the user's intent and dynamically selects tools such as `get_methodology_step`, `get_case_studies`, or `smile_overview` based on query keywords[cite: 70].
-2.  [cite_start]**Synthesis Phase**: Results are compiled into a Pydantic-validated structure, ensuring the output includes a direct answer, actionable steps, and verifiable sources[cite: 87].
+1.  **Research Phase**: The system identifies the user's intent and dynamically selects tools such as `get_methodology_step`, `get_case_studies`, or `smile_overview` based on query keywords.
+2.  **Synthesis Phase**: Results are compiled into a Pydantic-validated structure, ensuring the output includes a direct answer, actionable steps, and verifiable sources.
 
-[cite_start]The implementation includes 7 instances of explicit error handling to manage the subprocess bridge between Python and the Node.js MCP server[cite: 71, 87].
+The implementation includes 7 instances of explicit error handling to manage the subprocess bridge between Python and the Node.js MCP server.
 
 ---
 
@@ -28,7 +28,7 @@ GROQ_API_KEY=your_api_key_here
 ### 2. Dependency Management
 Install the required Python libraries:
 ```bash
-pip install langgraph langchain-groq pydantic python-dotenv
+pip install -r requirements.txt
 ```
 
 ### 3. MCP Server Preparation
@@ -45,7 +45,7 @@ The agent is designed to be portable. Before execution, the script dynamically r
 
 ### Execution Command
 ```bash
-python main.py
+python main-agent.py
 ```
 
 ### Path Configuration Logic
@@ -61,5 +61,5 @@ LPI_SERVER_CMD = ["node", os.path.join(_BASE_DIR, "dist", "src", "index.js")]
 ---
 
 ## Verification Status
-* [cite_start]**Bot Score**: 11/13 (85%) [cite: 56, 57]
-* [cite_start]**Verdict**: Strong submission with evidence of actual MCP tool interaction[cite: 70, 82].
+* **Bot Score**: 11/13 (85%).
+* **Verdict**: Strong submission with evidence of actual MCP tool interaction.
