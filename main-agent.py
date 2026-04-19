@@ -12,7 +12,7 @@ from langchain_groq import ChatGroq
 # Load environment variables
 load_dotenv()
 
-_REPO_ROOT = r"C:\Users\Muskan Kirti\yash_lpi"
+_REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
 LPI_SERVER_CMD = ["node", os.path.join(_REPO_ROOT, "dist", "src", "index.js")]
 LPI_SERVER_CWD = _REPO_ROOT
 
