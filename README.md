@@ -50,3 +50,4 @@ print(result['tool_outputs'])
 ## Insights
 
 By utilizing a graph-based state, the agent maintains a **provenance log**. This ensures that every recommendation made by the LLM is backed by a specific tool output, fulfilling the requirements for "Explainable AI" in domain-specific tasks.
+
