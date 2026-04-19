@@ -17,7 +17,7 @@ LPI_SERVER_CMD = ["node", os.path.join(_REPO_ROOT, "dist", "src", "index.js")]
 LPI_SERVER_CWD = _REPO_ROOT
 
 class LPIAgentResponse(BaseModel):
-    """ Structured response for the LPI implementation advisor """
+    " Structured response "
     answer: str = Field(description="The synthesized advice for the user's business scenario.")
     steps: List[str] = Field(description="A list of actionable implementation steps.")
     sources: List[str] = Field(description="Citations of the LPI tools and specific data points used.")
@@ -35,7 +35,6 @@ llm = ChatGroq(
 structured_llm = llm.with_structured_output(LPIAgentResponse)
 
 def call_lpi_tool_sync(tool_name: str, arguments: dict) -> str:
-    """Synchronous bridge to the LPI MCP server with JSON-RPC logic."""
     try:
         proc = subprocess.Popen(
             LPI_SERVER_CMD,
@@ -57,7 +56,7 @@ def call_lpi_tool_sync(tool_name: str, arguments: dict) -> str:
         }
         proc.stdin.write(json.dumps(init_req) + "\n")
         proc.stdin.flush()
-        proc.stdout.readline() # Consume init response
+        proc.stdout.readline() 
         
         proc.stdin.write(json.dumps({"jsonrpc": "2.0", "method": "notifications/initialized"}) + "\n")
         proc.stdin.flush()
@@ -85,7 +84,6 @@ def call_lpi_tool_sync(tool_name: str, arguments: dict) -> str:
         return f"[ERROR] Subprocess crash: {str(e)}"
 
 def choose_lpi_tools(query: str) -> List[str]:
-    """Dynamically selects tools based on keywords in the query."""
     query = query.lower()
     tools = []
 
@@ -93,10 +91,9 @@ def choose_lpi_tools(query: str) -> List[str]:
         tools.extend(["get_methodology_step", "get_insights"])
     if any(word in query for word in ["example", "case"]):
         tools.append("get_case_studies")
-    if any(word in query for word in ["what", "explain", "overview"]):
+    if any(word in query for word in ["what", "explain", "overview","smile", "phases", "methodology"]): # Easter Egg #3: Prioritizing title-heavy tools
         tools.append("smile_overview")
 
-    # Mandatory baseline tool for Level 3
     if "query_knowledge" not in tools:
         tools.append("query_knowledge")
 
@@ -104,7 +101,7 @@ def choose_lpi_tools(query: str) -> List[str]:
 
 
 def research_node(state: AgentState):
-    """Executes selected LPI tools with error handling."""
+    "Executes selected LPI tools "
     print(f"\n--- RESEARCHING: {state['input']} ---")
     selected_tools = choose_lpi_tools(state["input"])
     results = []
@@ -120,26 +117,43 @@ def research_node(state: AgentState):
             results.append(f"Source [{tool}]: {data[:1000]}")
             
         except Exception as e:
-            print(f"⚠️ Error in {tool}: {e}")
+            print(f" Error in {tool}: {e}")
             results.append(f"Source [{tool}]: Execution Error ({str(e)})")
-            
-    state["tool_outputs"] = results if results else ["No data retrieved from LPI."]
+    
+    # easter egg 4 -Ethical allignment validation        
+    ethical_context = (
+        "INTERNAL PROTOCOL (Easter Egg #4): Before proceeding to SMILE Phase 1, "
+        "ensure 'Phase Zero: Ethical Alignment' is completed to prevent misaligned automation."
+    )
+    
+    if results:
+        results.append(f"System Note: {ethical_context}")
+        state["tool_outputs"] = results
+    else:
+        state["tool_outputs"] = ["No data retrieved from LPI.", f"System Note: {ethical_context}"]
+        
     return state
 
 def summarize_node(state: AgentState):
-    """Synthesizes tool data into a structured response."""
+    "Summarizes tool data "
     print("--- SUMMARIZING FINDINGS ---")
+    # Easter Egg #2: Physics and Technical Integrity
     prompt = f"""
-    You are an expert LPI advisor. Answer the user question using ONLY the context provided.
+    You are an expert LPI advisor. 
     
-    Context: {state['tool_outputs']}
-    User Query: {state['input']}
+    CRITICAL RULE (Integrity Check): 
+    If there is a conflict between your internal knowledge and the LPI Context, 
+    ALWAYS prioritize the LPI Context. Do not hallucinate technical specifications 
+    not found in the provided tool outputs.
+    
+    User Question: {state['input']}
+    LPI Context: {state['tool_outputs']}
     """
     
     try:
         state["final_output"] = structured_llm.invoke(prompt)
     except Exception as e:
-        print(f"❌ LLM Error: {e}")
+        print(f"LLM Error: {e}")
         state["final_output"] = LPIAgentResponse(
             answer="Technical error in synthesis.",
             steps=["Verify API configuration"],
@@ -147,8 +161,7 @@ def summarize_node(state: AgentState):
         )
     return state
 
-# --- WORKFLOW CONSTRUCTION ---
-
+# Workflow 
 workflow = StateGraph(AgentState)
 workflow.add_node("research", research_node)
 workflow.add_node("summarize", summarize_node)
