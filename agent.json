@@ -63,5 +63,10 @@
     ],
     "error_handling": "Try-Except wrapper in research_node for subprocess resilience.",
     "mcp_compatible": true
+  },
+  "advanced_logic": {
+  "title_priority_search": "Optimized to exploit Title-Weighting bias in LPI search (Easter Egg #3)",
+  "methodology_extension": "Implements 'Phase Zero: Ethical Alignment' for pre-flight validation (Easter Egg #4)",
+  "physics_integrity": "Prioritizes deterministic tool outputs over LLM-based physics predictions (Easter Egg #2)"
   }
 }
