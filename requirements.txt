@@ -1,4 +1,8 @@
 langgraph
 langchain-groq
 pydantic
+typing
+asyncio
 python-dotenv
+json
+subprocess
